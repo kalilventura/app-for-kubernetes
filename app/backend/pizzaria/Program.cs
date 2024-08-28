@@ -8,7 +8,8 @@ using Microsoft.OpenApi.Models;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEntityFrameworkNpgsql().AddDbContext<PizzaDb>(opt =>
 {
-    opt.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
+    var connString = builder.Configuration.GetConnectionString("DefaultConnection");
+    opt.UseNpgsql(connString);
 });
 
 builder.Services.AddEndpointsApiExplorer();

@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pizzaria
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pizzaria
+  template:
+    metadata:
+      labels:
+        app: pizzaria
+    spec:
+      containers:
+      - name: pizzaria
+        image: kalilventura/pizzaria:2.0.0
+        imagePullPolicy: IfNotPresent
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 8080
+        - containerPort: 8081
+        env:
+        - name: ConnectionStrings__DefaultConnection
+          valueFrom:
+            secretKeyRef:
+              name: pizzaria-secrets
+              key: POSTGRES_CONNECTION_STRING
