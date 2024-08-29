@@ -1,22 +1,32 @@
-﻿FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
-USER $APP_UID
-WORKDIR /app
-EXPOSE 8080
-EXPOSE 8081
+FROM gradle:8.10.0-jdk17-alpine AS builder
 
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-ARG BUILD_CONFIGURATION=Release
-WORKDIR /src
-COPY . pizzaria/
-RUN dotnet restore "pizzaria/pizzaria.csproj"
-WORKDIR /src/pizzaria
-RUN dotnet build pizzaria.csproj -c $BUILD_CONFIGURATION -o /app/build
+ARG HOME_DIR="/home/app"
 
-FROM build AS publish
-ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "pizzaria.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN addgroup -S -g 1001 xyz \
+    && adduser -S -u 1001 -h $HOME_DIR -G xyz app
+WORKDIR $HOME_DIR
 
-FROM base AS final
-WORKDIR /app
-COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "pizzaria.dll"]
+COPY src src/
+COPY build.gradle settings.gradle ./
+
+RUN chown -R app:xyz $HOME_DIR
+USER app
+
+RUN gradle --no-daemon clean bootJar
+
+FROM amazoncorretto:22.0.2-alpine3.19
+
+RUN apk add --no-cache curl
+
+ARG HOME_DIR="/home/app"
+RUN addgroup -S -g 1001 xyz \
+    && adduser -S -u 1001 -h $HOME_DIR -G xyz app
+
+WORKDIR $HOME_DIR
+COPY --from=builder $HOME_DIR/build/libs/pizzaria-0.0.1.jar ./
+
+RUN chown -R app:xyz $HOME_DIR
+
+USER app
+
+CMD [ "java", "-jar", "/home/app/pizzaria-0.0.1.jar" ]
