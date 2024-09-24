@@ -1,13 +1,17 @@
+deploy-config:
+	kubectl apply -f backend-configmap.yaml
+
 deploy-secrets:
-	minikube kubectl -- apply -f backend-secrets.yaml
+	kubectl apply -f backend-secrets.yaml
 
 deploy-deployment:
-	minikube kubectl -- apply -f deployment.yaml
+	kubectl apply -f deployment.yaml
 
 deploy-service:
-	minikube kubectl -- apply -f service.yaml
+	kubectl apply -f service.yaml
 
 deploy:
+	make deploy-config
 	make deploy-secrets
 	make deploy-deployment
 	make deploy-service

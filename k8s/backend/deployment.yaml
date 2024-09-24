@@ -1,31 +1,36 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: pizzaria
+  name: pizzaria-api
+  labels:
+    name: pizzaria-api
+    tier: backend
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: pizzaria
+      app: pizzaria-api
+      tier: backend
   template:
     metadata:
       labels:
-        app: pizzaria
+        app: pizzaria-api
+        tier: backend
+        app.kubernetes.io/created-by: kalilventura
     spec:
       containers:
-      - name: pizzaria
-        image: kalilventura/pizzaria:2.0.0
-        imagePullPolicy: IfNotPresent
+      - name: pizzaria-api
+        image: kalilventura/pizzaria:3.0.0
+        imagePullPolicy: Always
         resources:
           limits:
             memory: "128Mi"
             cpu: "500m"
         ports:
         - containerPort: 8080
-        - containerPort: 8081
-        env:
-        - name: ConnectionStrings__DefaultConnection
-          valueFrom:
-            secretKeyRef:
-              name: pizzaria-secrets
-              key: POSTGRES_CONNECTION_STRING
+          name: http8080
+        envFrom:
+        - configMapRef:
+            name: pizzaria-api-configmap
+        - secretRef:
+            name: pizzaria-api-secrets
