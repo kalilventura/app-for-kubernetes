@@ -1,9 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: pizzaria-db-config
-  labels:
-    app: pizzaria-db
-    tier: database
-data:
-  POSTGRES_DB: bacco

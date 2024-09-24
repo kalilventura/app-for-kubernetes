@@ -21,16 +21,61 @@ spec:
       containers:
       - name: pizzaria-api
         image: kalilventura/pizzaria:3.0.0
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         resources:
           limits:
-            memory: "128Mi"
+            memory: "512Mi"
             cpu: "500m"
+          requests:
+            memory: "256Mi"
+            cpu: "200m"
         ports:
         - containerPort: 8080
-          name: http8080
         envFrom:
         - configMapRef:
-            name: pizzaria-api-configmap
+            name: pizzaria-configmap
         - secretRef:
-            name: pizzaria-api-secrets
+            name: pizzaria-secrets
+        env:
+        - name: DB_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: pizzaria-configmap
+              key: hostname
+        - name: DB_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: pizzaria-configmap
+              key: port
+        - name: DB_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: pizzaria-configmap
+              key: databasename
+        - name: DB_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: pizzaria-secrets
+              key: username
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: pizzaria-secrets
+              key: password
+        # Initial probe
+        livenessProbe:
+          httpGet:
+            path: /actuator/health/liveness
+            port: 8080
+          initialDelaySeconds: 50
+          failureThreshold: 5
+          periodSeconds: 10
+          timeoutSeconds: 5
+        # Once the container is up, test using HTTP health check
+        readinessProbe:
+          httpGet:
+            path: /actuator/health/readiness
+            port: 8080
+          initialDelaySeconds: 50
+          failureThreshold: 5
+          timeoutSeconds: 5

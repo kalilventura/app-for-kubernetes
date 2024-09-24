@@ -21,18 +21,34 @@ spec:
       containers:
       - name: pizzaria-db
         image: postgres:16.4
-        imagePullPolicy: Always
-        ports:
-        - containerPort: 5432
-        envFrom:
-        - configMapRef:
-            name: pizzaria-db-config
-        - secretRef:
-            name: pizzaria-db-secrets
+        imagePullPolicy: IfNotPresent
         resources:
           limits:
             memory: "256Mi"
             cpu: "800m"
+        ports:
+        - containerPort: 5432
+        envFrom:
+        - configMapRef:
+            name: pizzaria-configmap
+        - secretRef:
+            name: pizzaria-secrets
+        env:
+        - name: POSTGRES_DB
+          valueFrom:
+            configMapKeyRef:
+              name: pizzaria-configmap
+              key: databasename
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: pizzaria-secrets
+              key: username
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: pizzaria-secrets
+              key: password
         volumeMounts:
         - name: pizzaria-db-storage
           mountPath: /var/lib/postgresql/data

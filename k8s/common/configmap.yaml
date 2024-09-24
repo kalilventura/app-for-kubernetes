@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pizzaria-configmap
+data:
+  profile: prod
+  hostname: pizzaria-db
+  port: "5432"
+  databasename: bacco
