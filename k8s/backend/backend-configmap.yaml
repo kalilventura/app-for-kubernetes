@@ -1,9 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: pizzaria-api-configmap
-  labels:
-    app: pizzaria-app
-    tier: backend
-data:
-  PROFILE: prod

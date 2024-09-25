@@ -12,5 +12,6 @@ spec:
     tier: backend
   ports:
   - protocol: TCP
-    port: 8080
-    targetPort: 8080
+    port: 8080 # Service port (exposed to the app)
+    targetPort: 8080 # Container port (PostgreSQL port inside the pod)
+    nodePort: 30163

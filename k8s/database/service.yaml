@@ -6,11 +6,9 @@ metadata:
     app: pizzaria-db
     tier: database
 spec:
-  clusterIP: None # We Use DNS, Thus ClusterIP is not relevant
   selector:
     app: pizzaria-db
     tier: database
   ports:
-  - protocol: TCP
-    port: 5432
-    targetPort: 5432
+  - port: 5432 # Service port (exposed to the app)
+    targetPort: 5432 # Container port (PostgreSQL port inside the pod)
