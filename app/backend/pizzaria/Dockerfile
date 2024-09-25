@@ -23,10 +23,10 @@ RUN addgroup -S -g 1001 xyz \
     && adduser -S -u 1001 -h $HOME_DIR -G xyz app
 
 WORKDIR $HOME_DIR
-COPY --from=builder $HOME_DIR/build/libs/pizzaria-0.0.1.jar ./
+COPY --from=builder $HOME_DIR/build/libs/*.jar api.jar
 
 RUN chown -R app:xyz $HOME_DIR
 
 USER app
 
-CMD [ "java", "-jar", "/home/app/pizzaria-0.0.1.jar" ]
+CMD [ "java", "-jar", "/home/app/api.jar" ]
